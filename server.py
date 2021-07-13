@@ -23,3 +23,16 @@ class PublicConnectionManager:
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
+
+
+public_manager = PublicConnectionManager()
+
+
+@app.websocket("/chat")
+async def public_room(websocket: WebSocket):
+    await public_manager.connect(websocket)
+    await public_manager.broadcast(f"Someone joined the chat!")
+
+    while True:
+        data = await websocket.receive_json()
+        await public_manager.broadcast(f"{data.get('username')}> {data.get('message')}")
