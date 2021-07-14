@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from fastapi import FastAPI, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
@@ -5,14 +6,28 @@ from starlette.websockets import WebSocketDisconnect
 app = FastAPI()
 
 
-class PublicConnectionManager:
+class ConnectionManager(ABC):
+    def __init__(self):
+        self.active_connections = []
+
+    @abstractmethod
+    async def connect(self, websocket: WebSocket):
+        pass
+
+    @abstractmethod
+    def disconnect(self, websocket: WebSocket):
+        pass
+
+    @abstractmethod
+    async def broadcast(self, message: str):
+        pass
+
+
+class PublicConnectionManager(ConnectionManager):
     '''
     Stands for connection to the public chat room
     without limiting amount of connected clients
     '''
-
-    def __init__(self):
-        self.active_connections = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
