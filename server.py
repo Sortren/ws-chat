@@ -19,7 +19,7 @@ class ConnectionManager(ABC):
         pass
 
     @abstractmethod
-    async def broadcast(self, message: str):
+    async def broadcast(self, message: str, room_id=None):
         pass
 
 
@@ -61,6 +61,9 @@ class PrivateConnectionManager(ConnectionManager):
                 self.active_connections[index].remove(websocket)
                 if len(room) == 0:
                     self.active_connections.remove(room)
+
+    async def broadcast(self, message: str, room_id: int):
+        pass
 
 
 public_manager = PublicConnectionManager()
