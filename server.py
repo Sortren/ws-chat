@@ -70,6 +70,7 @@ class PrivateConnectionManager(ConnectionManager):
                 lambda client: len(client) == 1, self.active_connections
             )
         )
+        # assign client of found room -> choice returns random room with one client inside to catch him [0] is required
         free_client = choice(free_clients)[0]
         return self.find_room_id(free_client)
 
@@ -108,6 +109,9 @@ class PrivateConnectionManager(ConnectionManager):
         Broadcasting messages only for the specific room (where the client is located)
         '''
         for connection in self.active_connections[room_id]:
+            # TODO
+            # Broadcast throw anexception while trying to send a message when noone is in the room
+            # HAVE TO FIX IT!
             await connection.send_text(message)
 
 
