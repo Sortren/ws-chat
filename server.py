@@ -1,3 +1,8 @@
+'''TODO
+Split project to multiple files
+'''
+
+
 from abc import ABC, abstractmethod
 from fastapi import FastAPI, WebSocket
 from starlette.websockets import WebSocketDisconnect
@@ -48,11 +53,20 @@ class PrivateConnectionManager(ConnectionManager):
     '''
 
     def find_room(self, websocket: WebSocket) -> int:
+        '''
+        Returns the index of the room where the current client is connected to
+        '''
         for index, room in enumerate(self.active_connections):
             if websocket in room:
                 return index
 
     async def connect(self, websocket: WebSocket):
+        '''
+        Connecting clients to the private rooms with size of 2
+        Works like a queue, the next client in queue will be
+        paired with client with an empty slot in a room
+        '''
+
         await websocket.accept()
 
         if len(self.active_connections) == 0 or len(self.active_connections[-1]) == 2:
@@ -68,6 +82,9 @@ class PrivateConnectionManager(ConnectionManager):
                     self.active_connections.remove(room)
 
     async def broadcast(self, message: str, room_id: int):
+        '''
+        Broadcasting messages only for the specific room (where the client is located)
+        '''
         for connection in self.active_connections[room_id]:
             await connection.send_text(message)
 
