@@ -28,7 +28,7 @@ class PublicConnectionManager:
 public_manager = PublicConnectionManager()
 
 
-@app.websocket("/chat")
+@app.websocket("/chat/public-room")
 async def public_room(websocket: WebSocket):
     await public_manager.connect(websocket)
     await public_manager.broadcast(f"Someone joined the chat!")
