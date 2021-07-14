@@ -25,7 +25,7 @@ class ConnectionManager(ABC):
 
 class PublicConnectionManager(ConnectionManager):
     '''
-    Stands for connection to the public chat room
+    Stands for connection to the PUBLIC chat room
     without limiting amount of connected clients
     '''
 
@@ -39,6 +39,21 @@ class PublicConnectionManager(ConnectionManager):
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
+
+
+class PrivateConnectionManager(ConnectionManager):
+    '''
+    Stands for connection to the PRIVATE chat room
+    with limiting amount of connected clients to 2 by each room
+    '''
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+
+        if len(self.active_connections) == 0 or len(self.active_connections[-1]) == 2:
+            self.active_connections.append([websocket])
+        elif len(self.active_connections[-1]) < 2:
+            self.active_connections[-1].append(websocket)
 
 
 public_manager = PublicConnectionManager()
