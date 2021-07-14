@@ -6,6 +6,7 @@ Split project to multiple files
 from abc import ABC, abstractmethod
 from fastapi import FastAPI, WebSocket
 from starlette.websockets import WebSocketDisconnect
+from random import choice
 
 
 app = FastAPI()
@@ -52,13 +53,34 @@ class PrivateConnectionManager(ConnectionManager):
     with limiting amount of connected clients to 2 by each room
     '''
 
-    def find_room(self, websocket: WebSocket) -> int:
+    def find_room_id(self, websocket: WebSocket) -> int:
         '''
         Returns the index of the room where the current client is connected to
         '''
         for index, room in enumerate(self.active_connections):
             if websocket in room:
                 return index
+
+    def free_room_id(self) -> int:
+        '''
+        Returns the index of the random room where only one client is located
+        '''
+        free_clients = list(
+            filter(
+                lambda client: len(client) == 1, self.active_connections
+            )
+        )
+        free_client = choice(free_clients)[0]
+        return self.find_room_id(free_client)
+
+    def full_rooms(self) -> bool:
+        '''
+        Check if all of the rooms are fullfilled by clients
+        '''
+        for room in self.active_connections:
+            if len(room) < 2:
+                return False
+        return True
 
     async def connect(self, websocket: WebSocket):
         '''
@@ -69,10 +91,10 @@ class PrivateConnectionManager(ConnectionManager):
 
         await websocket.accept()
 
-        if len(self.active_connections) == 0 or len(self.active_connections[-1]) == 2:
+        if len(self.active_connections) == 0 or self.full_rooms():
             self.active_connections.append([websocket])
-        elif len(self.active_connections[-1]) < 2:
-            self.active_connections[-1].append(websocket)
+        else:
+            self.active_connections[self.free_room_id()].append(websocket)
 
     def disconnect(self, websocket: WebSocket):
         for index, room in enumerate(self.active_connections):
@@ -110,7 +132,7 @@ async def public_room(websocket: WebSocket):
 @app.websocket("/chat/private")
 async def private_room(websocket: WebSocket):
     await private_manager.connect(websocket)
-    room_id = private_manager.find_room(websocket)
+    room_id = private_manager.find_room_id(websocket)
     await private_manager.broadcast('Someone joined the chat!', room_id)
 
     try:
