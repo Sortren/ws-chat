@@ -63,7 +63,8 @@ class PrivateConnectionManager(ConnectionManager):
                     self.active_connections.remove(room)
 
     async def broadcast(self, message: str, room_id: int):
-        pass
+        for connection in self.active_connections[room_id]:
+            await connection.send_text(message)
 
 
 public_manager = PublicConnectionManager()
