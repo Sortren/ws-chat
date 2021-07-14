@@ -67,14 +67,13 @@ class PrivateConnectionManager(ConnectionManager):
         '''
         Returns the index of the random room where only one client is located
         '''
-        free_clients = list(
+        free_rooms = list(
             filter(
                 lambda client: len(client) == 1, self.active_connections
             )
         )
-        # assign client of found room -> choice returns random room with one client inside to catch him [0] is required
-        free_client = choice(free_clients)[0]
-        return self.find_room_id(free_client)
+        random_free_room = choice(free_rooms)
+        return self.active_connections.index(random_free_room)
 
     def full_rooms(self) -> bool:
         '''
