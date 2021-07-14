@@ -68,6 +68,7 @@ class PrivateConnectionManager(ConnectionManager):
 
 
 public_manager = PublicConnectionManager()
+private_manager = PrivateConnectionManager()
 
 
 @app.websocket("/chat/public-room")
