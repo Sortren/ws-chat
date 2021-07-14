@@ -1,4 +1,5 @@
 from fastapi import FastAPI, WebSocket
+from starlette.websockets import WebSocketDisconnect
 
 
 app = FastAPI()
@@ -33,6 +34,10 @@ async def public_room(websocket: WebSocket):
     await public_manager.connect(websocket)
     await public_manager.broadcast(f"Someone joined the chat!")
 
-    while True:
-        data = await websocket.receive_json()
-        await public_manager.broadcast(f"{data.get('username')}> {data.get('message')}")
+    try:
+        while True:
+            data = await websocket.receive_json()
+            await public_manager.broadcast(f"{data.get('username')}> {data.get('message')}")
+    except WebSocketDisconnect:
+        public_manager.disconnect(websocket)
+        await public_manager.broadcast(f"Someone left the chat!")
