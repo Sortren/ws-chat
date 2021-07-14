@@ -55,6 +55,13 @@ class PrivateConnectionManager(ConnectionManager):
         elif len(self.active_connections[-1]) < 2:
             self.active_connections[-1].append(websocket)
 
+    def disconnect(self, websocket: WebSocket):
+        for index, room in enumerate(self.active_connections):
+            if websocket in room:
+                self.active_connections[index].remove(websocket)
+                if len(room) == 0:
+                    self.active_connections.remove(room)
+
 
 public_manager = PublicConnectionManager()
 
