@@ -47,6 +47,11 @@ class PrivateConnectionManager(ConnectionManager):
     with limiting amount of connected clients to 2 by each room
     '''
 
+    def find_room(self, websocket: WebSocket) -> int:
+        for index, room in enumerate(self.active_connections):
+            if websocket in room:
+                return index
+
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
 
@@ -83,3 +88,11 @@ async def public_room(websocket: WebSocket):
     except WebSocketDisconnect:
         public_manager.disconnect(websocket)
         await public_manager.broadcast(f"Someone left the chat!")
+
+
+@app.websocket("/chat/private-room")
+async def private_room(websocket: WebSocket):
+    await private_manager.connect(websocket)
+
+    # await private_manager.broadcast('Someone joined the chat!', room_id)-> room_id needed somewhat!
+    pass
