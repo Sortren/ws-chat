@@ -44,7 +44,7 @@ class PrivateConnectionManager(ConnectionManager):
     with limiting amount of connected clients to 2 by each room
     '''
 
-    def find_room_id(self, websocket: WebSocket) -> int:
+    def current_room_id(self, websocket: WebSocket) -> int:
         '''
         Returns the index of the room where the current client is connected to
         '''
