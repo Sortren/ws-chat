@@ -1,7 +1,5 @@
 '''TODO
 1) Split project to multiple files
-2) Broadcast in PrivateConnectionManager throws an exception
-while trying to send a message when everyone left the room
 '''
 
 
@@ -109,8 +107,12 @@ class PrivateConnectionManager(ConnectionManager):
         '''
         Broadcasting messages only for the specific room (where the client is located)
         '''
-        for connection in self.active_connections[room_id]:
-            await connection.send_text(message)
+        try:
+            for connection in self.active_connections[room_id]:
+                await connection.send_text(message)
+        except IndexError:
+            # Error occurs if the app tries to send a broadcast to an empty room
+            pass
 
 
 public_manager = PublicConnectionManager()
