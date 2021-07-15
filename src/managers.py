@@ -64,7 +64,7 @@ class PrivateConnectionManager(ConnectionManager):
         random_free_room = choice(free_rooms)
         return self.active_connections.index(random_free_room)
 
-    def full_rooms(self) -> bool:
+    def are_rooms_full(self) -> bool:
         '''
         Check if all of the rooms are fullfilled by clients
         '''
@@ -82,7 +82,7 @@ class PrivateConnectionManager(ConnectionManager):
 
         await websocket.accept()
 
-        if len(self.active_connections) == 0 or self.full_rooms():
+        if len(self.active_connections) == 0 or self.are_rooms_full():
             self.active_connections.append([websocket])
         else:
             self.active_connections[self.free_room_id()].append(websocket)
