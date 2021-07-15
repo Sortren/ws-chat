@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from fastapi import FastAPI, WebSocket
+from fastapi import WebSocket
 from random import choice
 
 
