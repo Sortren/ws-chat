@@ -1,7 +1,7 @@
 # Chat {WebSocket} - FastAPI
 Basically a websocket that allows to connect to the public or private (random generated) chat.
 
-### Technologies used:
+## Technologies used:
 
 <img align = "left" alt = "Python" width = "26px" src = "https://user-images.githubusercontent.com/79079000/118809383-da383580-b8aa-11eb-9b90-b36be1ebd84a.png" />
 <img align = "left" alt = "FastAPI" width = "26px" src = "https://user-images.githubusercontent.com/79079000/125871360-23548c10-f1f7-4b42-ad6b-ed8eaec20490.png" />
@@ -10,6 +10,21 @@ Basically a websocket that allows to connect to the public or private (random ge
 <br />
 
 ----
+## How to build the project:
+1) Create virtual environment in your workdir by typing this command in your terminal (RECOMMENDED)
+### `$virtualenv venv`
+2) Activate venv
+### `$source venv/bin/activate`
+3) Install required python modules from requirements.txt file
+### `$pip install -r requirements.txt`
+4) Change current workdir to src
+### `$cd src`
+5) To run the server
+### `$uvicorn server:app --reload`
+
+----
+## Main logic
+
 The chats are split to the two endpoints, one is 
 ```python
 @app.websocket("/chat/public")
