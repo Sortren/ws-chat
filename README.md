@@ -22,6 +22,12 @@ Basically a websocket that allows to connect to the public or private (random ge
 5) To run the server
 ### `$uvicorn server:app --reload`
 
+### DISCLAIMER
+If running an uvicorn invokes an error like "no module named 'fastapi'" you likely gonna have to install fastapi globally on your python env,
+to do this, just type in your terminal
+### `$pip install fastapi`
+problem solved 😎
+
 ----
 ## Main logic
 
