@@ -15,30 +15,13 @@ class ConnectionManager(ABC):
     def disconnect(self, websocket: WebSocket):
         pass
 
+    @abstractmethod
     async def broadcast(self, message: str, room_id=None):
-        '''
-        Broadcasting messages appropriate for public/private chat room
-        '''
-        try:
-            for connection in self.active_connections if room_id is None else self.active_connections[room_id]:
-                await connection.send_text(message)
-        except IndexError:
-            # Error occurs if the app tries to send a broadcast to an empty room
-            pass
+        pass
 
+    @abstractmethod
     async def greeting_broadcast(self, websocket: WebSocket, room_id=None):
-        '''
-        Greeting message broadcasting depending on the client 
-        that is currently connected
-        '''
-        try:
-            for connection in self.active_connections if room_id is None else self.active_connections[room_id]:
-                if connection is websocket:
-                    await connection.send_text("Welcome to the chat room!")
-                else:
-                    await connection.send_text("Someone joined the chat!")
-        except IndexError:
-            pass
+        pass
 
 
 class PublicConnectionManager(ConnectionManager):
