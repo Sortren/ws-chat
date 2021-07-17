@@ -35,8 +35,8 @@ class PublicConnectionManager(ConnectionManager):
         '''
         Sends the number of current active clients in the public chat
         '''
-        for connection in self.public_chat:
-            await connection.send_text(str(len(self.public_chat)))
+        for client in self.public_chat:
+            await client.send_text(str(len(self.public_chat)))
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -97,7 +97,6 @@ class PrivateConnectionManager(ConnectionManager):
         creates new one
         '''
         await websocket.accept()
-
         free_rooms = self._free_rooms()
 
         if free_rooms:
@@ -107,11 +106,15 @@ class PrivateConnectionManager(ConnectionManager):
             self._generate_room(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        client_room = self._find_client_room(websocket)
+        client_room = self.find_client_room(websocket)
+
         if not client_room:
             return
 
         self._private_rooms[client_room].remove(websocket)
+
+        if not len(self._private_rooms[client_room]):
+            self._private_rooms.pop(client_room)
 
     async def broadcast(self, message: str, room_id):
         try:
