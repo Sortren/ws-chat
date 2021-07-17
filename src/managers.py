@@ -95,7 +95,7 @@ class PrivateConnectionManager(ConnectionManager):
 
         return free_rooms
 
-    def _find_client_room(self, websocket: WebSocket):
+    def find_client_room(self, websocket: WebSocket):
         '''
         Returns the id of the room where the client
         is connected to
