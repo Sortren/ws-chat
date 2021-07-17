@@ -19,7 +19,7 @@ async def public_chat(websocket: WebSocket):
             data = await websocket.receive_json()
             await public_manager.broadcast(f"{data.get('username')}> {data.get('message')}")
     except WebSocketDisconnect:
-        public_manager.disconnect(websocket)
+        await public_manager.disconnect(websocket)
         await public_manager.broadcast(f"Someone left the chat!")
 
 

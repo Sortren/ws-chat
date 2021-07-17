@@ -20,7 +20,7 @@ class ConnectionManager(ABC):
         Broadcasting messages appropriate for public/private chat room
         '''
         try:
-            for connection in (self.active_connections[room_id] if room_id else self.active_connections):
+            for connection in self.active_connections if room_id is None else self.active_connections[room_id]:
                 await connection.send_text(message)
         except IndexError:
             # Error occurs if the app tries to send a broadcast to an empty room
@@ -31,11 +31,14 @@ class ConnectionManager(ABC):
         Greeting message broadcasting depending on the client 
         that is currently connected
         '''
-        for connection in (self.active_connections[room_id] if room_id else self.active_connections):
-            if connection == websocket:
-                await connection.send_text("Welcome to the chat room!")
-            else:
-                await connection.send_text("Someone joined the chat!")
+        try:
+            for connection in self.active_connections if room_id is None else self.active_connections[room_id]:
+                if connection is websocket:
+                    await connection.send_text("Welcome to the chat room!")
+                else:
+                    await connection.send_text("Someone joined the chat!")
+        except IndexError:
+            pass
 
 
 class PublicConnectionManager(ConnectionManager):
@@ -43,13 +46,21 @@ class PublicConnectionManager(ConnectionManager):
     Stands for connection to the PUBLIC chat room
     without limiting amount of connected clients
     '''
+    async def send_counter(self):
+        '''
+        Sends the number of current active clients in the public chat
+        '''
+        for connection in self.active_connections:
+            await connection.send_text(str(len(self.active_connections)))
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
+        await self.send_counter()
 
-    def disconnect(self, websocket: WebSocket):
+    async def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
+        await self.send_counter()
 
 
 class PrivateConnectionManager(ConnectionManager):
