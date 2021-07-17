@@ -127,3 +127,20 @@ class PrivateConnectionManager(ConnectionManager):
             return
 
         self._private_rooms[client_room].remove(websocket)
+
+    async def broadcast(self, message: str, room_id):
+        try:
+            for client in self._private_rooms[room_id]:
+                await client.send_text(message)
+        except IndexError:
+            pass
+
+    async def greeting_broadcast(self, websocket: WebSocket, room_id: str):
+        try:
+            for client in self._private_rooms[room_id]:
+                if client is websocket:
+                    await client.send_text("Welcome to the chat room!")
+                else:
+                    await client.send_text("Someone joined the chat!")
+        except IndexError:
+            pass
