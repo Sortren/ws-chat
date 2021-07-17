@@ -12,7 +12,7 @@ private_manager = PrivateConnectionManager()
 @app.websocket("/chat/public")
 async def public_chat(websocket: WebSocket):
     await public_manager.connect(websocket)
-    await public_manager.broadcast(f"Someone joined the chat!")
+    await public_manager.greeting_broadcast(websocket)
 
     try:
         while True:
@@ -27,7 +27,7 @@ async def public_chat(websocket: WebSocket):
 async def private_chat(websocket: WebSocket):
     await private_manager.connect(websocket)
     current_room_id = private_manager.current_room_id(websocket)
-    await private_manager.broadcast('Someone joined the chat!', current_room_id)
+    await private_manager.greeting_broadcast(websocket, current_room_id)
 
     try:
         while True:

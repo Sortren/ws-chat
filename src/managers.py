@@ -15,9 +15,27 @@ class ConnectionManager(ABC):
     def disconnect(self, websocket: WebSocket):
         pass
 
-    @abstractmethod
     async def broadcast(self, message: str, room_id=None):
-        pass
+        '''
+        Broadcasting messages appropriate for public/private chat room
+        '''
+        try:
+            for connection in (self.active_connections[room_id] if room_id else self.active_connections):
+                await connection.send_text(message)
+        except IndexError:
+            # Error occurs if the app tries to send a broadcast to an empty room
+            pass
+
+    async def greeting_broadcast(self, websocket: WebSocket, room_id=None):
+        '''
+        Greeting message broadcasting depending on the client 
+        that is currently connected
+        '''
+        for connection in (self.active_connections[room_id] if room_id else self.active_connections):
+            if connection == websocket:
+                await connection.send_text("Welcome to the chat room!")
+            else:
+                await connection.send_text("Someone joined the chat!")
 
 
 class PublicConnectionManager(ConnectionManager):
@@ -32,10 +50,6 @@ class PublicConnectionManager(ConnectionManager):
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
-
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
 
 
 class PrivateConnectionManager(ConnectionManager):
@@ -93,14 +107,3 @@ class PrivateConnectionManager(ConnectionManager):
                 self.active_connections[index].remove(websocket)
                 if len(room) == 0:
                     self.active_connections.remove(room)
-
-    async def broadcast(self, message: str, room_id: int):
-        '''
-        Broadcasting messages only for the specific room (where the client is located)
-        '''
-        try:
-            for connection in self.active_connections[room_id]:
-                await connection.send_text(message)
-        except IndexError:
-            # Error occurs if the app tries to send a broadcast to an empty room
-            pass
