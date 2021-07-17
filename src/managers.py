@@ -20,7 +20,7 @@ class ConnectionManager(ABC):
         pass
 
     @abstractmethod
-    async def greeting_broadcast(self, websocket: WebSocket, room_id=None):
+    async def greeting_broadcast(self, websocket: WebSocket, room_id: str):
         pass
 
 
