@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from fastapi import WebSocket
-from random import choice
+import random
+import string
 
 
 class ConnectionManager(ABC):
-    def __init__(self):
-        self.active_connections = []
+    active_connections = []
 
     @abstractmethod
     async def connect(self, websocket: WebSocket):
@@ -69,34 +69,27 @@ class PrivateConnectionManager(ConnectionManager):
     with limiting amount of connected clients to 2 by each room
     '''
 
-    def current_room_id(self, websocket: WebSocket) -> int:
-        '''
-        Returns the index of the room where the current client is connected to
-        '''
-        for index, room in enumerate(self.active_connections):
-            if websocket in room:
-                return index
+    def __init__(self):
+        self._private_rooms = {}
 
-    def free_room_id(self) -> int:
-        '''
-        Returns the index of the random room where only one client is located
-        '''
-        free_rooms = list(
-            filter(
-                lambda client: len(client) == 1, self.active_connections
-            )
-        )
-        random_free_room = choice(free_rooms)
-        return self.active_connections.index(random_free_room)
+    def _generate_room(self, websocket: WebSocket):
+        room_id = ''.join(random.SystemRandom().choice(
+            string.ascii_uppercase + string.digits) for _ in range(12))
 
-    def are_rooms_full(self) -> bool:
-        '''
-        Check if all of the rooms are fullfilled by clients
-        '''
-        for room in self.active_connections:
-            if len(room) < 2:
-                return False
-        return True
+        self._private_rooms[room_id] = [websocket]
+
+    def _free_rooms(self):
+        free_rooms = []
+        for id, clients in self._private_rooms.items():
+            if len(clients) == 1:
+                free_rooms.append(id)
+
+        return free_rooms
+
+    def _find_client_room(self, websocket: WebSocket):
+        for id, clients in self._private_rooms.items():
+            if websocket in clients:
+                return id
 
     async def connect(self, websocket: WebSocket):
         '''
@@ -107,14 +100,17 @@ class PrivateConnectionManager(ConnectionManager):
 
         await websocket.accept()
 
-        if len(self.active_connections) == 0 or self.are_rooms_full():
-            self.active_connections.append([websocket])
+        free_rooms = self._free_rooms()
+
+        if free_rooms:
+            room_id = random.choice(free_rooms)
+            self._private_rooms[room_id].append(websocket)
         else:
-            self.active_connections[self.free_room_id()].append(websocket)
+            self._generate_room(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        for index, room in enumerate(self.active_connections):
-            if websocket in room:
-                self.active_connections[index].remove(websocket)
-                if len(room) == 0:
-                    self.active_connections.remove(room)
+        client_room = self._find_client_room(websocket)
+        if not client_room:
+            return
+
+        self._private_rooms[client_room].remove(websocket)
