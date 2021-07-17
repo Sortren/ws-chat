@@ -5,8 +5,6 @@ import string
 
 
 class ConnectionManager(ABC):
-    active_connections = []
-
     @abstractmethod
     async def connect(self, websocket: WebSocket):
         pass
@@ -29,20 +27,24 @@ class PublicConnectionManager(ConnectionManager):
     Stands for connection to the PUBLIC chat room
     without limiting amount of connected clients
     '''
+
+    def __init__(self):
+        self.public_chat = []
+
     async def send_counter(self):
         '''
         Sends the number of current active clients in the public chat
         '''
-        for connection in self.active_connections:
-            await connection.send_text(str(len(self.active_connections)))
+        for connection in self.public_chat:
+            await connection.send_text(str(len(self.public_chat)))
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        self.active_connections.append(websocket)
+        self.public_chat.append(websocket)
         await self.send_counter()
 
     async def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        self.public_chat.remove(websocket)
         await self.send_counter()
 
 
