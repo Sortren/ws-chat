@@ -73,12 +73,21 @@ class PrivateConnectionManager(ConnectionManager):
         self._private_rooms = {}
 
     def _generate_room(self, websocket: WebSocket):
+        '''
+        Generates new room with unique string id 
+        and inserts incoming client
+        '''
         room_id = ''.join(random.SystemRandom().choice(
             string.ascii_uppercase + string.digits) for _ in range(12))
 
         self._private_rooms[room_id] = [websocket]
 
     def _free_rooms(self):
+        '''
+        Returns IDs of the free rooms in a list,
+        Room is free when there is only one client,
+        so one slot is free for someone else
+        '''
         free_rooms = []
         for id, clients in self._private_rooms.items():
             if len(clients) == 1:
@@ -87,17 +96,21 @@ class PrivateConnectionManager(ConnectionManager):
         return free_rooms
 
     def _find_client_room(self, websocket: WebSocket):
+        '''
+        Returns the id of the room where the client
+        is connected to
+        '''
         for id, clients in self._private_rooms.items():
             if websocket in clients:
                 return id
 
     async def connect(self, websocket: WebSocket):
         '''
-        Connecting clients to the private rooms with size of 2
-        Works like a queue, the next client in queue will be
-        paired with client with an empty slot in a room
+        Connecting clients to the private rooms with size of two
+        works like a queue, the next client in queue will put
+        to a random free room, if all of the rooms are full,
+        creates new one
         '''
-
         await websocket.accept()
 
         free_rooms = self._free_rooms()
