@@ -23,9 +23,9 @@ class ConnectionManager(ABC):
 
     async def greeting_condition(self, websocket: WebSocket, client: WebSocket):
         if client is websocket:
-            await client.send_json({"message": "Welcome to the chat room!"})
+            await client.send_json({"greeting": "Welcome to the chat room!"})
         else:
-            await client.send_json({"message": "Someone joined the chat!"})
+            await client.send_json({"greeting": "Someone joined the chat!"})
 
 
 class PublicConnectionManager(ConnectionManager):
