@@ -121,6 +121,11 @@ class PrivateConnectionManager(ConnectionManager):
             for client in self._private_rooms[room_id]:
                 await client.send_text(message)
         except KeyError:
+            '''
+            Exception raised when server tries
+            to send a message to non existing room,
+            ex. when everyone left the current room
+            '''
             pass
 
     async def greeting_broadcast(self, websocket: WebSocket, room_id: str):
