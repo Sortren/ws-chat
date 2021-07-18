@@ -120,7 +120,7 @@ class PrivateConnectionManager(ConnectionManager):
         try:
             for client in self._private_rooms[room_id]:
                 await client.send_text(message)
-        except IndexError:
+        except KeyError:
             pass
 
     async def greeting_broadcast(self, websocket: WebSocket, room_id: str):
@@ -130,5 +130,5 @@ class PrivateConnectionManager(ConnectionManager):
                     await client.send_text("Welcome to the chat room!")
                 else:
                     await client.send_text("Someone joined the chat!")
-        except IndexError:
+        except KeyError:
             pass
