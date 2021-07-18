@@ -92,7 +92,7 @@ class PrivateConnectionManager(ConnectionManager):
 
         return free_rooms
 
-    def find_client_room(self, websocket: WebSocket):
+    def find_client_room_id(self, websocket: WebSocket):
         '''
         Returns the id of the room where the client
         is connected to
@@ -118,7 +118,7 @@ class PrivateConnectionManager(ConnectionManager):
             self._generate_room(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        client_room = self.find_client_room(websocket)
+        client_room = self.find_client_room_id(websocket)
 
         if not client_room:
             return

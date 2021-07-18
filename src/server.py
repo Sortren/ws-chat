@@ -27,13 +27,13 @@ async def public_chat(websocket: WebSocket):
 @app.websocket("/chat/private")
 async def private_chat(websocket: WebSocket):
     await private_manager.connect(websocket)
-    current_room_id = private_manager.find_client_room(websocket)
-    await private_manager.greeting_broadcast(websocket, current_room_id)
+    client_room_id = private_manager.find_client_room_id(websocket)
+    await private_manager.greeting_broadcast(websocket, client_room_id)
 
     try:
         while True:
             data = await websocket.receive_json()
-            await private_manager.broadcast(data, current_room_id)
+            await private_manager.broadcast(data, client_room_id)
     except WebSocketDisconnect:
         private_manager.disconnect(websocket)
-        await private_manager.broadcast({"message": "Someone left the chat!"}, current_room_id)
+        await private_manager.broadcast({"message": "Someone left the chat!"}, client_room_id)
