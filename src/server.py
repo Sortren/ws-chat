@@ -31,7 +31,7 @@ async def private_chat(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_json()
-            await private_manager.broadcast(f"{data.get('username')}> {data.get('message')}", current_room_id)
+            await private_manager.broadcast(data, current_room_id)
     except WebSocketDisconnect:
         private_manager.disconnect(websocket)
         await private_manager.broadcast('Someone left the chat!', current_room_id)

@@ -122,10 +122,10 @@ class PrivateConnectionManager(ConnectionManager):
         if not len(self._private_rooms[client_room]):
             self._private_rooms.pop(client_room)
 
-    async def broadcast(self, message: str, room_id):
+    async def broadcast(self, data: dict, room_id):
         try:
             for client in self._private_rooms[room_id]:
-                await client.send_text(message)
+                await client.send_json(data)
         except KeyError:
             '''
             Exception raised when server tries
