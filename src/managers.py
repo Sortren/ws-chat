@@ -14,11 +14,11 @@ class ConnectionManager(ABC):
         pass
 
     @abstractmethod
-    async def broadcast(self, message: str, room_id=None):
+    async def broadcast(self, message: dict, room_id=None):
         pass
 
     @abstractmethod
-    async def greeting_broadcast(self, websocket: WebSocket, room_id: str):
+    async def greeting_broadcast(self, websocket: WebSocket, room_id: str = None):
         pass
 
     async def greeting_condition(self, websocket: WebSocket, client: WebSocket):
@@ -50,6 +50,14 @@ class PublicConnectionManager(ConnectionManager):
 
     async def disconnect(self, websocket: WebSocket):
         self.public_chat.remove(websocket)
+
+    async def broadcast(self, data: dict):
+        for client in self.public_chat:
+            await client.send_json(data)
+
+    async def greeting_broadcast(self, websocket: WebSocket):
+        for client in self.public_chat:
+            await super().greeting_condition(websocket, client)
 
 
 class PrivateConnectionManager(ConnectionManager):
