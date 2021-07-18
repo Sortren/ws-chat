@@ -23,9 +23,9 @@ class ConnectionManager(ABC):
 
     async def greeting_condition(self, websocket: WebSocket, client: WebSocket):
         if client is websocket:
-            await client.send_text("Welcome to the chat room!")
+            await client.send_json({"message": "Welcome to the chat room!"})
         else:
-            await client.send_text("Someone joined the chat!")
+            await client.send_json({"message": "Someone joined the chat!"})
 
 
 class PublicConnectionManager(ConnectionManager):
@@ -142,6 +142,5 @@ class PrivateConnectionManager(ConnectionManager):
         try:
             for client in self._private_rooms[room_id]:
                 await super().greeting_condition(websocket, client)
-
         except KeyError:
             pass
