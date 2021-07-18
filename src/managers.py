@@ -37,21 +37,19 @@ class PublicConnectionManager(ConnectionManager):
     def __init__(self):
         self.public_chat = []
 
-    async def send_counter(self):
+    async def counter_broadcast(self):
         '''
         Sends the number of current active clients in the public chat
         '''
         for client in self.public_chat:
-            await client.send_text(str(len(self.public_chat)))
+            await client.send_json({"counter": str(len(self.public_chat))})
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.public_chat.append(websocket)
-        await self.send_counter()
 
     async def disconnect(self, websocket: WebSocket):
         self.public_chat.remove(websocket)
-        await self.send_counter()
 
 
 class PrivateConnectionManager(ConnectionManager):
