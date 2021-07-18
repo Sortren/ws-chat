@@ -21,7 +21,7 @@ async def public_chat(websocket: WebSocket):
     except WebSocketDisconnect:
         await public_manager.disconnect(websocket)
         await public_manager.counter_broadcast()
-        await public_manager.broadcast(f"Someone left the chat!")
+        await public_manager.broadcast({"message": "Someone left the chat!"})
 
 
 @app.websocket("/chat/private")
@@ -36,4 +36,4 @@ async def private_chat(websocket: WebSocket):
             await private_manager.broadcast(data, current_room_id)
     except WebSocketDisconnect:
         private_manager.disconnect(websocket)
-        await private_manager.broadcast('Someone left the chat!', current_room_id)
+        await private_manager.broadcast({"message": "Someone left the chat!"}, current_room_id)
