@@ -21,6 +21,12 @@ class ConnectionManager(ABC):
     async def greeting_broadcast(self, websocket: WebSocket, room_id: str):
         pass
 
+    async def greeting_condition(self, websocket: WebSocket, client: WebSocket):
+        if client is websocket:
+            await client.send_text("Welcome to the chat room!")
+        else:
+            await client.send_text("Someone joined the chat!")
+
 
 class PublicConnectionManager(ConnectionManager):
     '''
@@ -129,11 +135,13 @@ class PrivateConnectionManager(ConnectionManager):
             pass
 
     async def greeting_broadcast(self, websocket: WebSocket, room_id: str):
+        '''
+        Different message will be send depending
+        on the client
+        '''
         try:
             for client in self._private_rooms[room_id]:
-                if client is websocket:
-                    await client.send_text("Welcome to the chat room!")
-                else:
-                    await client.send_text("Someone joined the chat!")
+                await super().greeting_condition(websocket, client)
+
         except KeyError:
             pass
