@@ -14,11 +14,11 @@ class ConnectionManager(ABC):
         pass
 
     @abstractmethod
-    async def broadcast(self, message: dict, room_id=None):
+    async def broadcast(self, message: dict):
         pass
 
     @abstractmethod
-    async def greeting_broadcast(self, websocket: WebSocket, room_id: str = None):
+    async def greeting_broadcast(self, websocket: WebSocket):
         pass
 
     async def greeting_condition(self, websocket: WebSocket, client: WebSocket):
