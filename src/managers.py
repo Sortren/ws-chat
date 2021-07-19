@@ -41,8 +41,10 @@ class PublicConnectionManager(ConnectionManager):
         '''
         Sends the number of current active clients in the public chat
         '''
+        counter = str(len(self.public_chat))
+
         for client in self.public_chat:
-            await client.send_json({"counter": str(len(self.public_chat))})
+            await client.send_json({"counter": counter})
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
