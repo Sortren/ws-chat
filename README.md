@@ -29,7 +29,7 @@ to do this, just type in your terminal
 problem solved 😎
 
 ----
-## Main logic
+## Features
 
 The chats are split to the two endpoints, one is 
 ```python
@@ -57,9 +57,46 @@ In both cases the client sends a json that looks like this:
 
 Received json by the socket is used for sending a message to the chat room with username and message provided before.
 Messages are being transported amongs clients accordingly to the chosen endpoint.
+<br>
 Example output:
-```text
-example_username> example_message 
+```json
+{
+  "username": "example_username",
+  "message": "example_message"
+}
+```
+There is additional feature on the public chat, right after client's connection, client receives a json object with counter,
+that will help to figure out how many clients are currently on the server. This json is being send also when someone disconnect
+from the server it helps to keep the track online clients counter.
+<br>
+Example output: (one connected client)
+```json
+{
+  "counter": 1
+}
+```
+
+Another feature that works on both endpoints is a greeting message. Client receive different message if he joined the chat or someone else.
+<br>
+Example outputs:
+```json
+{
+  "greeting": "Welcome to the chat room!"
+}
+```
+```json
+{
+  "greeting": "Someone joined the chat!"
+}
+```
+
+Last but not least, a feature that sends a message to everyone whenever someone left the chat. It's being invoked on client's disconnection
+<br>
+Example output:
+```json
+{
+  "message": "Someone left the chat!"
+}
 ```
 ----
 ### Disclaimer about PrivateConnectionManager
